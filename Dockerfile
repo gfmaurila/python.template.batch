@@ -1,44 +1,32 @@
 FROM python:3.11-slim
 
-# Instala dependências do sistema e o driver ODBC 17 da Microsoft
-RUN apt-get update && apt-get install -y \
-    curl \
-    gnupg \
-    unixodbc \
-    unixodbc-dev \
-    gcc \
-    g++ \
-    libssl-dev \
-    freetds-dev \
-    build-essential \
-    libffi-dev \
-    libsasl2-dev \
-    libldap2-dev \
-    && curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - \
-    && curl https://packages.microsoft.com/config/debian/10/prod.list > /etc/apt/sources.list.d/mssql-release.list \
-    && apt-get update \
-    && ACCEPT_EULA=Y apt-get install -y msodbcsql17 \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Define diretório de trabalho
 WORKDIR /app
 
-# Copia arquivo de dependências
+# Instalar dependências para cx_Oracle
+RUN apt-get update && apt-get install -y \
+    libaio1 \
+    gcc \
+    unzip \
+    build-essential && \
+    rm -rf /var/lib/apt/lists/*
+
+# ⬇️ Usar instantclient.zip local (coloque na raiz do projeto)
+COPY instantclient.zip .
+
+RUN mkdir -p /opt/oracle && \
+    unzip instantclient.zip -d /opt/oracle && \
+    rm instantclient.zip && \
+    echo "/opt/oracle/instantclient_23_8" > /etc/ld.so.conf.d/oracle-instantclient.conf && \
+    ldconfig
+
+ENV LD_LIBRARY_PATH=/opt/oracle/instantclient_23_8
+ENV PATH=$PATH:/opt/oracle/instantclient_23_8
+
 COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
-# Instala dependências Python
-RUN pip install --upgrade pip && pip install --no-cache-dir -r requirements.txt
+COPY . .
 
-# Copia o restante do projeto
-COPY ./src ./src
-COPY ./src/core/env/.env.docker .env
-
-# Define variáveis de ambiente
 ENV PYTHONPATH=/app/src
-ENV ENVIRONMENT=docker
 
-# Expõe a porta da API
-EXPOSE 8002
-
-# Comando para iniciar a aplicação
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8002", "--app-dir", "src"]
+ENTRYPOINT ["python", "src/entrypoint.py"]

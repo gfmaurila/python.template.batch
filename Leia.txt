@@ -1,100 +1,70 @@
-# http://127.0.0.1:8081/docs
 
-- pip install uvicorn
-- pip install fastapi
-- pip install pydantic-settings
-- python -m pip install --upgrade pip
-- pip show pydantic
-- pip install pika
-- pip freeze > requirements.txt
-- pip install -r requirements.txt
-- pip install kafka-python
-- pip install pydantic[email]
-- pip install SQLAlchemy
-- pip freeze > requirements.txt
-- pip install asyncpg  # se usar PostgreSQL assíncrono
-- pip install pymysql  # se usar MySQL
-- pip install psycopg2 # se usar PostgreSQL síncrono
-- pip freeze > requirements.txt
-- pip install pyodbc
-- pip install psycopg2-binary==2.9.10
-- pip install psycopg2-binary==2.9.10
-- pip freeze > requirements.txt
 
-- uvicorn --version
+uvicorn main:app --reload --port 8081 --app-dir src
 
-# uvicorn main:app --reload --port 8081 --app-dir src
+
+✅ 1. Ative seu ambiente virtual (se estiver usando um)
+
+python -m venv .venv
+source .venv/bin/activate   # Linux/macOS
+.venv\Scripts\activate      # Windows
+
+
+✅ 2. Instale as dependências
+
+✅ Solução recomendada
+Você pode instalar o Rust no seu Windows com apenas um comando:
+
+🟧 Instalar via PowerShell:
+
+Ou acesse: https://rustup.rs/
+
+Depois de instalar o Rust e reiniciar o terminal, repita:
 
 
 
-01 - Padrão de projeto - API
-02 - Startando o projeto 
+Navegue até a raiz do projeto e execute:
+
+cd .\src\batch\
+
+pip freeze > .\src\batch\requirements.txt
+
+pip install -r .\src\batch\requirements.txt
 
 
-
-192.168.1.102
-
+Se não tiver requirements.txt, posso gerar com base no seu projeto (cx_Oracle, pymongo, redis, pydantic, etc.).
 
 
+✅ 3. Defina a variável de ambiente ENVIRONMENT
+Esse passo é essencial para carregar o .env correto com base no Config.py.
+
+Windows (CMD ou PowerShell):
+
+set ENVIRONMENT=development
 
 
+✅ 4. Execute o projeto
+Usando o menu interativo:
+
+cd src
+python -m batch.main
+
+python src/batch/main.py
 
 
+Ou execute diretamente um job:
 
 
+python src/batch/OracleToMongoJob.py
+python src/batch/OracleToRedisJob.py
 
 
+🧪 Verificação rápida
+Você verá no terminal algo como:
 
 
-
-
-
-
-
-
-
-
-Rodar o projeto
-
-    - > Pressione Ctrl+Shift+P
-    - > Digite Tasks: Run Task
-    - > Selecione Run FastAPI (Uvicorn)
-
-    ou 
-
-    - > Ctrl + Shift + B
-
-
-
-
-
-
-Inicie o debug com F5
-
-    - > Vá no menu "Run and Debug"
-
-    - > Clique em "Start Debugging" (F5)
-
-    - > Selecione o ambiente Python: FastAPI
+[OracleToMongoJob] Inseridos 4 registros no MongoDB
 
 
 
 
-
-
-GIT
-
-    - git add .
-    - git commit -m "feat(tela-login): implementa tela de login"
-    - git push origin feature/usuarioX-tela-login
-
-
--- Padrão de mensagens de commit
-
-    - `feat`: nova funcionalidade
-    - `fix`: correção de bug
-    - `docs`: alterações na documentação
-    - `style`: formatação, sem alteração de código
-    - `refactor`: refatoração de código
-    - `test`: adição ou modificação de testes
-    - `chore`: mudanças em tarefas de build ou configuração

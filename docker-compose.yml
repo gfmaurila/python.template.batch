@@ -8,42 +8,20 @@ version: "3.9"
 
 services:
 
-  python_template_api:
-    build: .
-    container_name: python_template_api
-    ports:
-      - "8002:8002"
-    volumes:
-      - .:/app
-    depends_on:
-      - sqlserver
-      - redis
-      - mongoserver
-      - rabbitmq
-      - kafka1
-      - oracle
-      - oracle-db
-    networks:
-      - app-backend
-
-  worker:
+  batch:
     build:
       context: .
-      dockerfile: Dockerfile
-    container_name: python_worker
-    command: python src/worker/main.py
-    volumes:
-      - .:/app
+    container_name: python_batch
+    restart: always
+    environment:
+      - ENVIRONMENT=docker
+    command: mongo
     depends_on:
-      - sqlserver
-      - redis
-      - mongoserver
-      - rabbitmq
-      - kafka1
       - oracle
-      - oracle-db
+      - mongoserver
+      - redis
     networks:
-      - app-backend  
+      - app-backend
 
   sqlserver:
     image: mcr.microsoft.com/azure-sql-edge:latest
