@@ -23,212 +23,113 @@ python.template.api/
 └── src/
     ├── api/
     │   ├── AuthController.py
-    │   ├── GithubController.py
-    │   ├── LogController.py
-    │   ├── MessageController.py
-    │   ├── MessagingTestController.py
-    │   ├── RedisPostController.py
-    │   └── UserController.py
+# 📦 Projeto Python Batch – Bulk Insert Oracle → MongoDB e Redis
+
+## 📖 Visão Geral
+
+Este projeto é um **Batch Job** escrito em Python, com base nos princípios de:
+
+- ✅ DDD (Domain-Driven Design)
+- ✅ CQRS (Command Query Responsibility Segregation)
+- ✅ Padrão de nomenclatura e estrutura similar a projetos em C#
+- ✅ Execução independente via linha de comando (ou cronjob/CI)
+- ✅ Integração com Oracle, MongoDB e Redis
+
+Seu objetivo inicial é executar a **carga de dados em lote (bulk insert)** de tabelas Oracle para:
+
+- **MongoDB**: para persistência histórica
+- **Redis**: para uso como cache rápido
+
+---
+
+## 🏗 Estrutura do Projeto
+
+```bash
+python.template.batch/
+└── src/
+    ├── batch/
+    │   ├── OracleToMongoJob.py              # Job para gravar dados no MongoDB
+    │   ├── OracleToRedisJob.py              # Job para gravar dados no Redis
+    │   ├── main.py                          # Dispatcher de múltiplos jobs
     ├── application/
-    │   ├── Auth/         # Login, Esqueci e Redefinir senha
-    │   ├── Github/       # GitHub Integration
-    │   ├── Log/          # Gerenciamento de logs
-    │   ├── Message/      # CRUD MongoDB
-    │   └── User/         # Usuários com eventos e mensageria
+    │   └── ExampleJob/
+    │       ├── commands/
+    │       │   └── ExecuteExampleJobCommand.py
+    │       └── services/
+    │           └── ExampleJobService.py
     ├── core/
-    │   ├── domain/
-    │   ├── env/
-    │   ├── response/
-    │   ├── security/
-    │   └── util/
-    ├── domain/
-    │   ├── entities/
-    │   ├── enums/
     │   ├── interfaces/
-    │   └── valueobjects/
+    │   │   └── IBatchJob.py                 # Interface padrão para jobs
+    │   └── services/
+    │       └── LoggerService.py             # Logger customizado
+    ├── domain/
+    │   └── entities/
+    │       └── EmployeeEntity.py
     ├── infrastructure/
-    │   ├── database/
-    │   ├── integration/github/
-    │   ├── logging/
-    │   ├── messaging/User/Pub/
-    │   ├── repositories/
-    │   └── service/
-    ├── worker/
-    │   ├── User/
-    │   └── main.py
-    └── main.py
+    │   ├── oracle/OracleRepository.py       # Leitura de dados Oracle
+    │   ├── mongo/MongoRepository.py         # Escrita no MongoDB
+    │   └── redis/RedisRepository.py         # Escrita no Redis
+└── README.md
 ```
 
 ---
 
 ## 🚀 Como Executar o Projeto
 
-### 🔧 Local com Python
+### 🔧 Localmente com Python
 
 ```bash
 pip install -r requirements.txt
-cd src
-uvicorn main:app --reload --port 8081
-```
 
-Acesse:
-- Swagger: http://localhost:8081/docs
-- Redoc: http://localhost:8081/redoc
+# Executa job para MongoDB
+python src/batch/OracleToMongoJob.py
 
-### 🐳 Com Docker
+# Executa job para Redis
+python src/batch/OracleToRedisJob.py
 
-```bash
-docker-compose up --build
-```
-
-Ou apenas o worker:
-
-```bash
-docker-compose run --rm worker
+# Ou usa o dispatcher principal
+python src/batch/main.py
 ```
 
 ---
 
-## 📦 Endpoints Disponíveis
+## 🐳 Docker Oracle XE (para testes)
 
-### 🔐 AuthController
+Adicione ao seu `docker-compose.yml`:
 
-| Método | Rota                      | Descrição                  |
-|--------|---------------------------|----------------------------|
-| POST   | /auth/login               | Login com e-mail e senha   |
-| POST   | /auth/forgot-password     | Envia código por e-mail    |
-| POST   | /auth/reset-password      | Redefine senha com código  |
-
-### 👤 UserController
-
-| Método | Rota           | Descrição         |
-|--------|----------------|-------------------|
-| GET    | /users         | Lista usuários    |
-| GET    | /users/{id}    | Busca por ID      |
-| POST   | /users         | Cria usuário      |
-| PUT    | /users/{id}    | Atualiza usuário  |
-| DELETE | /users/{id}    | Remove usuário    |
-
-### 🧪 MessagingTestController
-
-Testes manuais com mensageria:
-
-| Método | Rota                    |
-|--------|-------------------------|
-| POST   | /test-messaging/redis   |
-| POST   | /test-messaging/rabbitmq|
-| POST   | /test-messaging/kafka   |
-
-### 📫 RedisPostController
-
-CRUD usando Redis:
-
-| Método | Rota                     |
-|--------|--------------------------|
-| GET    | /redis-posts             |
-| GET    | /redis-posts/{id}        |
-| POST   | /redis-posts             |
-| PUT    | /redis-posts/{id}        |
-| DELETE | /redis-posts/{id}        |
-
-### 📨 MessageController (MongoDB)
-
-CRUD usando MongoDB:
-
-| Método | Rota                 |
-|--------|----------------------|
-| GET    | /messages            |
-| GET    | /messages/{id}       |
-| POST   | /messages            |
-| PUT    | /messages/{id}       |
-| DELETE | /messages/{id}       |
-
-### 🐱 GithubController
-
-| Método | Rota                        | Descrição                      |
-|--------|-----------------------------|--------------------------------|
-| GET    | /github/user                | Perfil GitHub (live)           |
-| GET    | /github/repos               | Repositórios GitHub (live)     |
-| POST   | /github/store/profile       | Armazena perfil no Mongo       |
-| POST   | /github/store/repos         | Armazena repositórios no Mongo |
-| GET    | /github/stored/profile      | Recupera perfil do Mongo       |
-| GET    | /github/stored/repos        | Recupera repositórios do Mongo |
-
-### 📜 LogController
-
-| Método | Rota              | Descrição                         |
-|--------|-------------------|-----------------------------------|
-| GET    | /logs/?limit=100  | Lista logs                        |
-| DELETE | /logs/?older_than=YYYY-MM-DDTHH:mm:ss | Remove logs antigos |
+```yaml
+oracle-db:
+  image: oracleinanutshell/oracle-xe-11g
+  container_name: oracle_db
+  ports:
+    - "49161:1521"
+    - "8080:8080"
+  environment:
+    - ORACLE_ALLOW_REMOTE=true
+    - ORACLE_DISABLE_ASYNCH_IO=true
+  restart: always
+  networks:
+    - app-backend
+```
 
 ---
 
-## 🧩 Validações e Responses Padronizados
+## 🔌 Tecnologias
 
-Todas as respostas seguem o formato:
-
-```json
-{
-  "success": true,
-  "status_code": 200,
-  "success_message": "Mensagem",
-  "errors": [],
-  "data": {}
-}
-```
-
-Erros de validação retornam:
-
-```json
-{
-  "success": false,
-  "status_code": 422,
-  "errors": [
-    { "message": "Campo é obrigatório." }
-  ],
-  "data": null
-}
-```
-
-> 📍 Classes: `ApiResult`, `ExceptionHandler` em `core/response`
+- Python 3.11+
+- Oracle XE (via Docker)
+- MongoDB
+- Redis
+- `cx_Oracle`, `pymongo`, `redis-py`, `logging`, `dotenv`
 
 ---
 
-## 📫 Mensageria Assíncrona
+## 🧠 Padrões e Convenções
 
-Suporte a 3 mecanismos via Pub/Sub:
-
-### Redis
-
-- Canais: `user-created`, `user-updated`, `user-deleted`
-- Publisher: `RedisPublisher.py`
-- Subscriber: `RedisSubscriber.py`
-
-### RabbitMQ
-
-- Fanout exchange
-- Publisher: `RabbitMQPublisher.py`
-- Subscriber: `RabbitSubscriber.py`
-- Painel: http://localhost:15672
-
-### Kafka
-
-- Tópico: `user-topic` (via .env)
-- Publisher: `KafkaPublisher.py`
-- Subscriber: `KafkaSubscriber.py`
-- Painel UI opcional: http://localhost:9100
-
----
-
-## 🧪 Testes via Postman
-
-Importe o arquivo:
-
-```
-📁 API - Python.postman_collection.json
-```
-
-E utilize todos os endpoints documentados por coleção: Auth, Messaging, MongoDB, Redis, GitHub, Logs e User.
+- Jobs implementam a interface `IBatchJob` com método `Handle()`
+- Comandos seguem o padrão `CommandHandler`
+- Estrutura e nomes idênticos ao modelo usado em projetos C#
+- Domínio separado por entidades e serviços de aplicação
 
 ---
 
