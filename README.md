@@ -1,28 +1,5 @@
 
-# 📘 Documentação Técnica - API Python com CQRS, DDD e FastAPI
 
-## 📖 Visão Geral
-
-Este projeto é um **template de arquitetura Python** com os padrões:
-
-- ✅ DDD (Domain-Driven Design)
-- ✅ CQRS (Command Query Responsibility Segregation)
-- ✅ Vertical Slices Architecture
-- ✅ FastAPI como framework web principal
-- ✅ MongoDB, Redis, Kafka e RabbitMQ como integrações
-- ✅ JWT para autenticação
-- ✅ Log centralizado com MongoDB
-- ✅ Validações, Responses padronizadas e mensagens traduzidas
-
----
-
-## 🏗 Estrutura do Projeto
-
-```bash
-python.template.api/
-└── src/
-    ├── api/
-    │   ├── AuthController.py
 # 📦 Projeto Python Batch – Bulk Insert Oracle → MongoDB e Redis
 
 ## 📖 Visão Geral
